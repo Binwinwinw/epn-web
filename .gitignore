@@ -1,0 +1,43 @@
+# Fichiers de configuration sensibles
+config.prod.php
+config.local.php
+
+# Fichiers d'environnement
+.env
+.env.local
+.env.production
+.env.prod
+.env.*.local
+
+# Logs
+*.log
+error_log
+
+# Fichiers temporaires
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Fichiers d'éditeur
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dépendances front locales
+node_modules/
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*~
+
+# Sauvegardes de base de données
+database/backups/
+*.sql.bak
+
+
+# Mémoire locale hors dépôt
+.memory/

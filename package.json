@@ -1,0 +1,13 @@
+{
+  "name": "epn-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build assets for the EPN PHP application",
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./public/assets/css/tailwind.input.css -o ./public/assets/css/tailwind.generated.css --minify",
+    "tailwind:watch": "tailwindcss -i ./public/assets/css/tailwind.input.css -o ./public/assets/css/tailwind.generated.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
