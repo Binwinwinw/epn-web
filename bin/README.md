@@ -1,21 +1,35 @@
 # Scripts d'Administration EPN Web
 
-## `manage-users.php`
+## Sécurité
 
-Script de gestion des utilisateurs en ligne de commande.
+Ces scripts sont destinés au terminal uniquement. Ils refusent toute exécution depuis le navigateur.
 
-### Installation
+## `install.php`
 
-```bash
-# Le script est déjà en place
-# Rendre exécutable (optionnel sur Linux/Mac)
-chmod +x manage-users.php
-```
+Script d’installation sécurisé pour créer la base de données et un compte administrateur principal.
 
 ### Utilisation
 
 ```bash
-php manage-users.php <command> [options]
+php bin/install.php --admin-password "MotDePasseFort123!" --admin-user admin
+```
+
+### Exemple sécurisé
+
+```bash
+php bin/install.php --admin-user admin --admin-password "T0pS3curePassword!2025"
+```
+
+Aucun compte par défaut faible n’est créé en mode sécurisé.
+
+## `manage-users.php`
+
+Script de gestion des utilisateurs en ligne de commande.
+
+### Utilisation
+
+```bash
+php bin/manage-users.php <command> [options]
 ```
 
 ### Commandes
@@ -23,57 +37,37 @@ php manage-users.php <command> [options]
 #### Créer un utilisateur
 
 ```bash
-php manage-users.php create <username> <password> [--role=admin|agent|referent] [--sites=BAC,MAC]
-
-# Exemples
-php manage-users.php create john_doe "MyPassword123" --role=agent --sites=BAC
-php manage-users.php create jane_smith "AnotherPassword" --role=admin --sites=BAC,MAC
+php bin/manage-users.php create <username> <password> [--role=admin|agent|referent] [--sites=BAC,MAC]
 ```
 
 #### Lister les utilisateurs
 
 ```bash
-php manage-users.php list
+php bin/manage-users.php list
 ```
 
 #### Réinitialiser le mot de passe
 
 ```bash
-php manage-users.php reset-password <username> <new_password>
-
-# Exemple
-php manage-users.php reset-password john_doe "NewPassword123"
+php bin/manage-users.php reset-password <username> <new_password>
 ```
 
 #### Changer le rôle
 
 ```bash
-php manage-users.php set-role <username> <role>
-
-# Exemple
-php manage-users.php set-role john_doe admin
+php bin/manage-users.php set-role <username> <role>
 ```
 
 #### Changer les sites autorisés
 
 ```bash
-php manage-users.php set-sites <username> <sites>
-
-# Exemple
-php manage-users.php set-sites john_doe BAC,MAC
-```
-
-#### Désactiver/Activer un utilisateur
-
-```bash
-php manage-users.php disable <username>
-php manage-users.php enable <username>
+php bin/manage-users.php set-sites <username> <sites>
 ```
 
 #### Supprimer un utilisateur
 
 ```bash
-php manage-users.php delete <username>
+php bin/manage-users.php delete <username>
 ```
 
 ### Notes importantes
@@ -83,12 +77,12 @@ php manage-users.php delete <username>
 - 🔒 Le script ne sauvegarde pas les mots de passe en clair
 - 📝 Toutes les modifications sont enregistrées dans la base de données
 
-### Accès de développement
+## `reset-passwords.php`
 
-Un utilisateur `admin` avec le mot de passe `changeme123` est créé par défaut.
-
-**À CHANGER IMMÉDIATEMENT après le déploiement** :
+Script de réinitialisation contrôlée. Il refuse son exécution sans confirmation explicite.
 
 ```bash
-php manage-users.php reset-password admin "VotreNouveauMotDePasse"
+php bin/reset-passwords.php --force --admin-password "MotDePasseFort123!" --demo-password "AutreMotDePasseFort456!"
 ```
+
+Le dossier [bin](bin) ne doit jamais être exposé publiquement. Il doit rester hors du dossier web accessible.

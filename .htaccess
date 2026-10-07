@@ -1,45 +1,39 @@
-# Configuration Apache pour l'application EPN
+﻿# Configuration Apache pour l'application EPN
 
 RewriteEngine On
 RewriteBase /epn-web/
 
-# NE PAS rediriger les fichiers et répertoires réels
+# Blocage immédiat des chemins sensibles et des fichiers de configuration
+RewriteCond %{REQUEST_URI} ^/bin(?:/|$) [NC,OR]
+RewriteCond %{REQUEST_URI} ^/src(?:/|$) [NC,OR]
+RewriteCond %{REQUEST_URI} ^/database(?:/|$) [NC,OR]
+RewriteCond %{REQUEST_URI} ^/(?:\.git|\.github|\.memory)(?:/|$) [NC,OR]
+RewriteCond %{REQUEST_URI} ^/(?:\.env|\.env\..+|\.htaccess)$ [NC,OR]
+RewriteCond %{REQUEST_URI} ^/.*\.(?:sql|log|ini)$ [NC]
+RewriteRule ^ - [F,L]
 
+# NE PAS rediriger les fichiers et répertoires réels
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Rediriger les requêtes vers public/ SAUF pour src/ et database/ qui doivent rester inaccessibles
-
-# Cette règle capture /index.php, /login, etc et les redirige vers public/
-
-RewriteCond %{REQUEST_URI} !^/src/
-RewriteCond %{REQUEST_URI} !^/database/
-RewriteCond %{REQUEST_URI} !^/\.
-RewriteRule ^(.\*)$ public/$1 [L]
-
-# Protection des fichiers sensibles (via RewriteCond plutôt que FilesMatch)
-
-# Bloquer l'accès direct aux fichiers SQL/logs/INI
-
-RewriteCond %{REQUEST_FILENAME} \.(sql|log|ini)$ [NC]
-RewriteRule ^ - [F]
-
-# Les répertoires sensibles sont déjà bloqués par les RewriteCond ci-dessus
+# Rediriger les requêtes vers public/ SAUF pour les chemins sensibles déjà bloqués ci-dessus
+RewriteCond %{REQUEST_URI} !^/bin(?:/|$) [NC]
+RewriteCond %{REQUEST_URI} !^/src(?:/|$) [NC]
+RewriteCond %{REQUEST_URI} !^/database(?:/|$) [NC]
+RewriteCond %{REQUEST_URI} !^/(?:\.git|\.github|\.memory)(?:/|$) [NC]
+RewriteCond %{REQUEST_URI} !^/(?:\.env|\.env\..+|\.htaccess)$ [NC]
+RewriteRule ^(.*)$ public/$1 [L]
 
 # Configuration PHP
-
 php_value upload_max_filesize 10M
 php_value post_max_size 10M
 php_value max_execution_time 300
 php_value max_input_time 300
 
 # Encodage UTF-8
-
 AddDefaultCharset UTF-8
 
 # Forcer l'environnement (décommentez pour forcer la production)
-
 # SetEnv EPN_ENVIRONMENT production
-
 # SetEnv EPN_ENVIRONMENT local

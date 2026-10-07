@@ -1,18 +1,39 @@
 <?php
+
 /**
- * Reset des mots de passe de démo
- * Usage: php bin/reset-passwords.php
+ * Reset volontaire des mots de passe de démonstration
+ * Usage: php bin/reset-passwords.php --force --admin-password "StrongPassword123" --demo-password "StrongPassword456"
  */
 
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit("This script must be run from the command line.\n");
+}
+
+$options = getopt('', ['force', 'admin-password::', 'demo-password::']);
+if (!isset($options['force'])) {
+    fwrite(STDERR, "Erreur: ajoutez --force pour confirmer la réinitialisation des mots de passe.\n");
+    exit(1);
+}
+
+$adminPassword = $options['admin-password'] ?? null;
+$demoPassword = $options['demo-password'] ?? null;
+
+if (empty($adminPassword) || strlen($adminPassword) < 12) {
+    fwrite(STDERR, "Erreur: --admin-password est requis et doit contenir au moins 12 caractères.\n");
+    exit(1);
+}
+
 $users = [
-    'admin' => 'changeme123',
-    'referent1' => 'password123',
-    'referent2' => 'password123',
-    'agent1' => 'password123'
+    'admin' => $adminPassword,
 ];
 
-echo "🔐 Génération des hashes de mots de passe\n";
-echo "========================================\n\n";
+if (!empty($demoPassword) && strlen($demoPassword) >= 12) {
+    $users['agent1'] = $demoPassword;
+}
+
+echo "🔐 Réinitialisation des comptes avec mots de passe forts\n";
+echo "===================================================\n\n";
 
 $config = require '../src/config/config.local.php';
 $dbConfig = $config['database'];
@@ -23,20 +44,16 @@ try {
         $dbConfig['user'],
         $dbConfig['pass']
     );
-    
+
     foreach ($users as $username => $password) {
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
-        echo "Utilisateur: $username\n";
-        echo "  Mot de passe: $password\n";
-        echo "  Hash: $hash\n";
-        
         $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE username = ?");
         $stmt->execute([$hash, $username]);
-        echo "  ✅ Mis à jour\n\n";
+        echo "✅ $username mis à jour\n";
     }
-    
-    echo "✅ Tous les mots de passe ont été réinitialisés!\n";
+
+    echo "\n✅ Réinitialisation terminée.\n";
 } catch (Exception $e) {
     echo "❌ Erreur: " . $e->getMessage() . "\n";
+    exit(1);
 }
-?>
